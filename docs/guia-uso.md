@@ -7,7 +7,7 @@ Versión 1.0 · 19 de noviembre de 2026
 TacticReaction es un juego por turnos de reacciones en cadena. Compites por el control de un tablero mientras descubres trampas y ventajas. Además de jugar, puedes observar cómo un agente decide y ejecutar experimentos para explicar inteligencia artificial en una exposición.
 
 ### Inicio en un minuto
-1. Abre la aplicación publicada en Render. El enlace verificado está en docs/despliegue.md, dentro del repositorio de GitHub.
+1. Abre https://ia-proyectoreaction.onrender.com en tu navegador.
 2. En «Tu próxima partida», elige «Tú contra la IA», tablero 6 × 6 y nivel «Táctico».
 3. Pulsa «Nueva partida». Si es tu primera visita, la aplicación ya habrá preparado una arena por defecto.
 4. Pulsa una casilla vacía. Tu color es menta; el rival usa coral. La IA responderá automáticamente.

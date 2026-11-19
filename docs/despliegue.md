@@ -2,6 +2,12 @@
 
 Repositorio: https://github.com/jhona66612-coder/ia_proyectoreaction
 
+Aplicación publicada: https://ia-proyectoreaction.onrender.com
+
+Panel de Render: https://dashboard.render.com/web/srv-dbvhh2m1egvs73dhgnt0
+
+Proyecto Supabase: https://supabase.com/dashboard/project/tczgxinjixvyzdvvrons
+
 ## Configuración
 
 - Proveedor: Render, espacio My Workspace.
@@ -11,12 +17,16 @@ Repositorio: https://github.com/jhona66612-coder/ia_proyectoreaction
 - Inicio: npm start
 - Node: 22 o superior.
 - Puerto: variable PORT proporcionada por Render; escucha en 0.0.0.0.
-- Endpoint de salud: /health.
+- Endpoint de salud disponible: /health. Render usa su comprobación TCP predeterminada.
 - Variables: SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY; APP_ORIGIN opcional.
 - Base: Supabase, proyecto ia-proyectoreaction, región sa-east-1.
 - Esquema aplicado: supabase/schema.sql.
 
-La URL y el resultado de verificación del servicio se incorporan después de que Render confirme el estado live.
+## Verificación realizada el 19/11/2026
+
+Render confirmó el estado live. La prueba HTTP pública comprobó una partida IA contra IA hasta su fin, recuperación del mismo número de jugadas desde Supabase, aislamiento de otra sesión, ejecución de 12 partidas en el laboratorio y descarga HTTP 200 de ambas guías. En esa ejecución, la última decisión evaluó 3102 nodos, produjo 494 cortes y tardó 391.18 ms. Son mediciones de una ejecución, no un SLA.
+
+En desarrollo se probaron además ocho turnos consecutivos con persistencia real. Las 19 pruebas automatizadas pasaron localmente y en el build de Render. Se inspeccionó la interfaz pública en navegador y se probaron jugadas y respuesta automática de la IA.
 
 ## Actualizar
 

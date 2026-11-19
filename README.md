@@ -4,7 +4,7 @@ Juego táctico para demostrar agentes de inteligencia artificial, basado en la p
 
 ## Jugar y estudiar
 
-- Aplicación: la URL verificada se registra en `docs/despliegue.md`.
+- [Jugar en Render](https://ia-proyectoreaction.onrender.com).
 - [Guía de uso](docs/guia-uso.pdf) · [versión Markdown](docs/guia-uso.md).
 - [Guía de agentes](docs/guia-agentes.pdf) · [versión Markdown](docs/guia-agentes.md).
 - [Matriz de cumplimiento](docs/matriz-cumplimiento.md).
