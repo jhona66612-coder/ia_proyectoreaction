@@ -1,0 +1,15 @@
+{
+  "name": "ia_proyectoreaction",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "TacticReaction: juego táctico multiagente con información parcial",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server/server.mjs",
+    "dev": "node --watch server/server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "experiment": "node scripts/experiment.mjs",
+    "train": "node scripts/train.mjs"
+  }
+}

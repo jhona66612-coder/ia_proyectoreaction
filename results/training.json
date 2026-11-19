@@ -1,0 +1,138 @@
+{
+  "kind": "genetic",
+  "seed": 2026,
+  "generations": 4,
+  "population": 6,
+  "weights": [
+    3.359,
+    2.925,
+    3.496,
+    1.075,
+    9.174
+  ],
+  "fitness": 0.75,
+  "history": [
+    {
+      "generation": 1,
+      "best": 0.75,
+      "mean": 0.5416666666666666,
+      "weights": [
+        3.359336643200368,
+        4.573986845090985,
+        2.5997195712290706,
+        1.0748061263933777,
+        3.692358952760696
+      ]
+    },
+    {
+      "generation": 2,
+      "best": 0.75,
+      "mean": 0.5416666666666666,
+      "weights": [
+        3.359,
+        2.925,
+        4.985,
+        1.075,
+        9.174
+      ]
+    },
+    {
+      "generation": 3,
+      "best": 0.5,
+      "mean": 0.16666666666666666,
+      "weights": [
+        3.359,
+        4.486,
+        2.755,
+        2,
+        2.877
+      ]
+    },
+    {
+      "generation": 4,
+      "best": 0.75,
+      "mean": 0.5416666666666666,
+      "weights": [
+        3.359,
+        2.925,
+        3.496,
+        1.075,
+        9.174
+      ]
+    }
+  ],
+  "holdout": [
+    {
+      "seed": 12026,
+      "side": 1,
+      "winner": 2,
+      "truncated": false,
+      "moves": 2,
+      "nodes": 32,
+      "prunes": 0,
+      "timeMs": 0.12000000000000001,
+      "meanMs": 0.060000000000000005,
+      "maxMs": 0.07,
+      "decisions": 2,
+      "brier": 0.22988425925925926,
+      "reveals": 2,
+      "explosions": 0
+    },
+    {
+      "seed": 12026,
+      "side": 2,
+      "winner": 2,
+      "truncated": false,
+      "moves": 2,
+      "nodes": 31,
+      "prunes": 0,
+      "timeMs": 0.14,
+      "meanMs": 0.07,
+      "maxMs": 0.07,
+      "decisions": 2,
+      "brier": 0.16745370370370372,
+      "reveals": 3,
+      "explosions": 1
+    },
+    {
+      "seed": 12027,
+      "side": 1,
+      "winner": 2,
+      "truncated": false,
+      "moves": 4,
+      "nodes": 59,
+      "prunes": 0,
+      "timeMs": 0.33,
+      "meanMs": 0.0825,
+      "maxMs": 0.13,
+      "decisions": 4,
+      "brier": 0.23707162228796846,
+      "reveals": 4,
+      "explosions": 2
+    },
+    {
+      "seed": 12027,
+      "side": 2,
+      "winner": 2,
+      "truncated": false,
+      "moves": 22,
+      "nodes": 247,
+      "prunes": 0,
+      "timeMs": 1.9300000000000002,
+      "meanMs": 0.08772727272727274,
+      "maxMs": 0.35,
+      "decisions": 22,
+      "brier": 0.1131542566872428,
+      "reveals": 16,
+      "explosions": 38
+    }
+  ],
+  "trainingMatches": 96,
+  "operators": {
+    "selection": "Torneo de 2",
+    "crossover": "Uniforme",
+    "mutation": 0.25,
+    "elitism": 1
+  },
+  "note": "Aptitud de 4 partidas por candidato frente al agente base. Validación separada de 4 partidas; no garantiza una mejora general."
+}
