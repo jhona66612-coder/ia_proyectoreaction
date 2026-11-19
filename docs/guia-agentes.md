@@ -2,7 +2,7 @@
 ## TacticReaction
 ### Arquitectura, algoritmos y evidencia experimental
 
-Versión 1.0 · 19 de noviembre de 2026
+Versión 2.0 · 19 de noviembre de 2026
 
 Este documento explica la implementación real del proyecto. Los algoritmos se ejecutan en JavaScript sobre Node.js. No se llama a un LLM, no se generan jugadas con texto y no se requiere un servicio de IA de pago.
 
@@ -173,6 +173,28 @@ El porcentaje de riesgo de una celda es una creencia del modelo, no una frecuenc
 
 ### Experimento ampliado sugerido
 Para una evaluación académica más sólida, aumenta las semillas, compara rival aleatorio y agente base, separa entrenamiento y test, alterna lados y registra tableros y presupuestos idénticos. Reporta incertidumbre estadística y distribución de tiempos, además del promedio. No mezcles los resultados de la configuración rápida con los del modo Experto.
+
+<!-- page -->
+## Animación y vista móvil
+### Separación entre simulación y presentación
+El motor shared/engine.mjs produce una lista pública timeline cuando el servidor pide animate: true. Cada recepción incluye celda, jugador, estado anterior, estado con una carga añadida, estado tras el evento y cantidad capturada. Cada explosión registra su origen y los recibos de sus vecinos. Los eventos no revelados siguen como null; la semilla no forma parte de la animación.
+
+public/animation.js reproduce estos recibos con Web Animations: llegada, unión, absorción, cambio de color, expansión y distribución ortogonal. No inventa movimientos ni recalcula reglas. El estado del servidor se guarda antes de comenzar la animación; omitirla, cerrar la pestaña o recargar conserva el resultado calculado.
+
+Los grupos contienen esferas parcialmente superpuestas: dos forman una pareja unida, tres un trébol y cuatro muestran la sobrecarga transitoria. Un rotor CSS los hace girar dentro de su casilla. El contador conserva el número exacto incluso durante una sobrecarga mayor. El marcador se actualiza al terminar la secuencia.
+
+### Captura y conservación
+Capturar significa convertir todas las cargas rivales y sumar la que llega. Una recepción de dos cargas rivales produce tres propias. El efecto visual contrae el grupo rival y lo reemplaza por el grupo unido del atacante. Solo las trampas eliminan cargas; las ventajas añaden una. Las explosiones redistribuyen masa, no la crean ni la destruyen.
+
+### Ritmo y límites
+La interfaz bloquea nuevas jugadas hasta acabar la secuencia. El turno automático se programa después. La animación tiene tres velocidades y se puede omitir. También se desactiva cuando el usuario pide reducir movimiento en su sistema. Para mantener respuestas fluidas, las secuencias largas se aceleran; se devuelven hasta 160 cuadros lógicos y, si se exceden, se informa que se muestra directamente el resultado completo. La cola del motor siempre se resuelve con sus límites habituales.
+
+Los recibos solo viajan en la respuesta de la jugada. La persistencia conserva la partida y su bitácora compacta, no todos los fotogramas. Las pruebas reconstruyen una cascada desde los recibos y comparan su resultado con el motor, además de verificar capturas, trampas, ventajas, conservación de cargas y ausencia de secretos sin revelar.
+
+### Pantallas y reglas opcionales
+La ruta / contiene configuración, laboratorio y guías. /play es la vista de juego; «Empezar partida» abre una pestaña y comparte la sesión segura del navegador. Si el navegador impide abrirla, se navega en la pestaña actual. Solo la vista de juego programa los turnos de IA; una pestaña en segundo plano no programa nuevas decisiones.
+
+La cuadrícula usa casillas de 44 a 52 px y altura dinámica de la pantalla, con áreas seguras y desplazamiento interno para tableros grandes. Se ofrecen once formatos hasta 10 columnas y 12 filas. Las reglas Clásico crean un mapa normal conocido; sirven para aprender las cascadas. Las reglas Táctico conservan el generador y la inferencia de eventos de la propuesta. Los experimentos incluidos siguen usando el modo Táctico en 4 × 4.
 
 <!-- page -->
 ## Operación, seguridad y trazabilidad

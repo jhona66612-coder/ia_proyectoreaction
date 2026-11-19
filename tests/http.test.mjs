@@ -17,5 +17,9 @@ test('HTTP game lifecycle, hidden map, isolation, persistence and input validati
   assert.equal((await (await fetch(base+'/api/session')).json()).game,null);
   assert.equal((await fetch(base+'/server/server.mjs')).status,404);
   assert.equal((await fetch(base+'/')).status,200);assert.equal((await fetch(base+'/app.js')).status,200);
+  assert.equal((await fetch(base+'/play')).status,200);assert.equal((await fetch(base+'/animation.js')).status,200);
+  assert.equal(moved.timeline[0].kind,'place');assert.equal(moved.timeline[0].receipt.before.event,null);
+  const rect=await (await send('new',{rows:8,cols:6,rules:'classic',mode:'human-human'})).json();assert.equal(rect.game.cells.length,48);assert.equal(rect.game.rules,'classic');assert(rect.game.cells.every(c=>c.event===0));
+  assert.equal((await send('new',{rows:13,cols:6})).status,400);
  }finally{child.kill();}
 });

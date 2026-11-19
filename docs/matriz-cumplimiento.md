@@ -2,7 +2,9 @@
 
 | Requisito | Entrega | Evidencia / límite |
 |---|---|---|
-| Tablero N × M, capacidades 1/2/3 | `shared/engine.mjs` | Motor admite combinaciones 4/6/8; interfaz ofrece cuadrados 4/6/8 |
+| Tablero N × M, capacidades 1/2/3 | `shared/engine.mjs` | 4–10 columnas y 4–12 filas; once formatos cuadrados y verticales en la interfaz |
+| Arena móvil y reacciones visibles | `public/animation.js`, `public/mobile.css` | Casillas 44–52 px, fusión giratoria, viajes y absorción; recibos públicos del motor, verificados por reconstrucción |
+| Configuración independiente | `/` y `/play` | Partida en otra pestaña; alternativa en la actual si el navegador la bloquea |
 | Jugadas en vacías o propias | `legalMoves`, `applyMove` | Valida también en servidor; pruebas rechazan las ilegales |
 | Trampas y ventajas desconocidas | `observe` y frontera de `chooseMove` | Evento no revelado = null; semilla solo al finalizar |
 | Efectos de eventos | `applyMove` | Se eligen las variantes borrar cargas / +1 carga; consumo único |

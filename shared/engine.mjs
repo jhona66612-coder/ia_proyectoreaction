@@ -68,10 +68,11 @@ export function generateMap(rows,cols,seed) {
   }
   return {events,report:{method:'PSR · MRV · grado · LCV · AC-3 · forward checking + búsqueda local',nodes,backtracks,arcRevisions,improvements,before,after:cost,traps:k,bonuses:v,density:(k+v)/n}};
 }
-export function createGame({rows=6,cols=6,seed=1,mode='human-ai',difficulty='tactical'}={}) {
-  if(![4,6,8].includes(rows)||![4,6,8].includes(cols)) throw new Error('Dimensiones no admitidas');
-  const map=generateMap(rows,cols,seed);
-  return {rows,cols,seed,mode,difficulty,turn:1,moves:0,played:[false,false,false],winner:null,reason:null,cells:map.events.map(event=>({owner:0,charge:0,event,revealed:false})),generator:map.report};
+export function createGame({rows=6,cols=6,seed=1,mode='human-ai',difficulty='tactical',rules='tactical'}={}) {
+  if(!Number.isInteger(rows)||!Number.isInteger(cols)||rows<4||cols<4||rows>12||cols>10||rows*cols>120) throw new Error('Dimensiones no admitidas');
+  if(!['classic','tactical'].includes(rules))throw new Error('Reglas no admitidas');
+  const map=rules==='classic'?{events:Array(rows*cols).fill(0),report:{method:'Clásico: sin eventos ocultos',nodes:0,backtracks:0,arcRevisions:0,improvements:0,before:0,after:0,traps:0,bonuses:0,density:0}}:generateMap(rows,cols,seed);
+  return {rows,cols,seed,mode,difficulty,rules,turn:1,moves:0,played:[false,false,false],winner:null,reason:null,cells:map.events.map(event=>({owner:0,charge:0,event,revealed:rules==='classic'})),generator:map.report};
 }
 export function terminal(s) {
   if(!s.played[1] || !s.played[2]) return null;
@@ -81,23 +82,31 @@ export function terminal(s) {
   if(!cells[2]) return 1;
   return null;
 }
-export function applyMove(state,index,{trace=false,deadline=Infinity}={}) {
+export function applyMove(state,index,{trace=false,animate=false,deadline=Infinity}={}) {
   if(state.winner!==null) throw new Error('La partida terminó');
   if(!Number.isInteger(index)||index<0||index>=state.cells.length) throw new Error('Casilla inválida');
   if(state.cells[index].owner && state.cells[index].owner!==state.turn) throw new Error('Esa casilla pertenece al rival');
-  const s=clone(state), player=s.turn, log=[]; s.moves++;s.played[player]=true;
+  const s=clone(state), player=s.turn, log=[], timeline=[]; s.moves++;s.played[player]=true;
   const queue=[], seen=new Set(); let explosions=0, processed=0;
+  const visible=c=>({owner:c.owner,charge:c.charge,revealed:c.revealed,event:c.revealed?c.event:null});
+  // Animation receipts contain only public values. They are never inputs to the rules.
   function add(i) {
-    const c=s.cells[i];c.owner=player;c.charge++;
+    const c=s.cells[i], receipt=animate?{index:i,player,before:visible(c),captured:c.owner!==0&&c.owner!==player?c.charge:0}:null;
+    c.owner=player;c.charge++;
+    if(receipt)receipt.charged=visible(c);
     if(!c.revealed) {
       c.revealed=true;
       if(trace)log.push({kind:'reveal',index:i,event:c.event});
-      if(c.event===TRAP) {c.charge=0;c.owner=0;return;}
+      if(receipt)receipt.reveal=c.event;
+      if(c.event===TRAP) {c.charge=0;c.owner=0;if(receipt)receipt.after=visible(c);return receipt;}
       if(c.event===BONUS)c.charge++;
     }
+    if(receipt)receipt.after=visible(c);
     if(c.charge>capacity(i,s.rows,s.cols))queue.push(i);
+    return receipt;
   }
-  add(index);
+  const placement=add(index);
+  if(animate)timeline.push({kind:'place',player,receipt:placement});
   // An opening trap can eliminate the acting player; terminality is checked before cascades.
   let win=terminal(s);
   while(queue.length && win===null) {
@@ -105,8 +114,11 @@ export function applyMove(state,index,{trace=false,deadline=Infinity}={}) {
     if(processed%16===0 && performance.now()>deadline) throw new Error('SEARCH_TIMEOUT');
     const i=queue.shift(),c=s.cells[i], adjacent=neighbors(i,s.rows,s.cols);
     if(c.charge<adjacent.length)continue;
+    const frame=animate&&timeline.length<160?{kind:'explode',index:i,player,before:visible(c),targets:[]}:null;
     c.charge-=adjacent.length;c.owner=c.charge?player:0;explosions++;
-    for(const j of adjacent)add(j);
+    if(frame)frame.after=visible(c);
+    for(const j of adjacent){const receipt=add(j);if(frame)frame.targets.push(receipt);}
+    if(frame)timeline.push(frame);
     if(c.charge>=adjacent.length)queue.push(i);
     if(trace)log.push({kind:'explode',index:i,targets:adjacent});
     win=terminal(s);
@@ -119,7 +131,7 @@ export function applyMove(state,index,{trace=false,deadline=Infinity}={}) {
   if(s.winner!==null) s.reason??=s.winner===0?'Ambos jugadores quedaron sin cargas':'Eliminación total';
   if(s.winner===null && s.moves>=300){s.winner=0;s.reason='Límite de 300 jugadas';}
   s.turn=3-player;
-  return {state:s,events:log,explosions};
+  return {state:s,events:log,explosions,...(animate?{timeline,animationTruncated:explosions>timeline.length-1}:{})};
 }
 export function observe(s,{reveal=false}={}) {
   const {seed,...publicState}=s;

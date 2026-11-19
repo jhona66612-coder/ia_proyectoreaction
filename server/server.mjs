@@ -19,13 +19,13 @@ function limit(req){const ip=(req.headers['x-forwarded-for']??req.socket.remoteA
 function view(record){return {game:observe(record.game,{reveal:record.game.winner!==null}),revision:record.revision,belief:infer(observe(record.game),record.styles?.[record.game.turn]??[.5,.5]),history:record.history,analysis:record.analysis??null,weights:record.weights,persistence:persistent?'Supabase':'Memoria local',stats:record.stats};}
 function execute(record,index,analysis=null) {
   const before=record.game,belief=infer(observe(before),record.styles?.[before.turn]??[.5,.5]),player=before.turn;
-  const result=applyMove(before,index,{trace:true});
+  const result=applyMove(before,index,{trace:true,animate:true});
   for(const e of result.events)if(e.kind==='reveal'){record.stats.brierSum+=brier(belief.cells[e.index],e.event);record.stats.reveals++;}
   record.styles??={1:[.5,.5],2:[.5,.5]};record.styles[3-player]=updateStyle(record.styles[3-player],capacity(index,before.rows,before.cols)<=2?'cautious':'bold');
   record.game=result.state;record.revision++;record.stats.explosions+=result.explosions;
   if(analysis){record.analysis=analysis;record.stats.nodes+=analysis.metrics.nodes;record.stats.prunes+=analysis.metrics.prunes;record.stats.aiTimes.push(analysis.metrics.timeMs);}
   record.history.push({turn:before.moves+1,player,index,events:result.events,explosions:result.explosions,metrics:analysis?.metrics??null});
-  return result.events;
+  return {events:result.events,timeline:result.timeline,animationTruncated:result.animationTruncated};
 }
 async function ai(state,options) {
   if(activeAI>=2)fail('La IA está atendiendo otra partida. Intenta de nuevo.',429);activeAI++;
@@ -43,10 +43,10 @@ export const server=http.createServer(async(req,res)=>{
   let lock=null;
   try {
     const url=new URL(req.url,'http://localhost');
-    if(url.pathname==='/health')return json(res,200,{ok:true,app:'TacticReaction',version:'1.0.0',storage:persistent?'supabase':'memory'});
+    if(url.pathname==='/health')return json(res,200,{ok:true,app:'TacticReaction',version:'2.0.0',storage:persistent?'supabase':'memory'});
     if(!url.pathname.startsWith('/api/')) {
       if(req.method!=='GET'&&req.method!=='HEAD')fail('Método no admitido',405);
-      let relative=url.pathname==='/'?'public/index.html':url.pathname.startsWith('/docs/')?'docs/'+url.pathname.slice(6):'public/'+url.pathname.slice(1);
+      let relative=['/','/play','/play/'].includes(url.pathname)?'public/index.html':url.pathname.startsWith('/docs/')?'docs/'+url.pathname.slice(6):'public/'+url.pathname.slice(1);
       const target=path.resolve(root,relative);
       if(!target.startsWith(root+path.sep)||relative.includes('..'))fail('No encontrado',404);
       let content;try{content=await readFile(target);}catch{fail('No encontrado',404);}
@@ -71,9 +71,10 @@ export const server=http.createServer(async(req,res)=>{
     if(locks.has(id))fail('Hay una jugada en curso',409);locks.add(id);lock=id;
     const data=await body(req);let record=await read(token);
     if(url.pathname==='/api/new') {
-      const mode=['human-ai','human-human','ai-ai'].includes(data.mode)?data.mode:'human-ai',size=Number(data.size??6);
+      const mode=['human-ai','human-human','ai-ai'].includes(data.mode)?data.mode:'human-ai',rows=Number(data.rows??data.size??8),cols=Number(data.cols??data.size??6);
       const difficulty=['explorer','tactical','expert'].includes(data.difficulty)?data.difficulty:'tactical';
-      record={game:createGame({rows:size,cols:size,seed:randomInt(1,2147483647),mode,difficulty}),revision:(record?.revision??0)+1,styles:{1:[.5,.5],2:[.5,.5]},history:[],weights:record?.weights??training.weights??DEFAULT_WEIGHTS,stats:{nodes:0,prunes:0,explosions:0,brierSum:0,reveals:0,aiTimes:[]}};
+      const rules=data.rules??'tactical';
+      record={game:createGame({rows,cols,seed:randomInt(1,2147483647),mode,difficulty,rules}),revision:(record?.revision??0)+1,styles:{1:[.5,.5],2:[.5,.5]},history:[],weights:record?.weights??training.weights??DEFAULT_WEIGHTS,stats:{nodes:0,prunes:0,explosions:0,brierSum:0,reveals:0,aiTimes:[]}};
       await save(token,record);return json(res,200,view(record));
     }
     if(!record)fail('Tu partida no está disponible. Crea una nueva.',404);
@@ -103,8 +104,8 @@ export const server=http.createServer(async(req,res)=>{
     // Work on a detached copy; failed writes never mutate an in-memory committed record.
     record=structuredClone(record);
     const analysis=isAI?await ai(record.game,{weights:record.weights,style:record.styles?.[record.game.turn]??[.5,.5]}):null;
-    const events=execute(record,analysis?.index??data.index,analysis);
-    await save(token,record);return json(res,200,{...view(record),events});
+    const animation=execute(record,analysis?.index??data.index,analysis);
+    await save(token,record);return json(res,200,{...view(record),...animation});
   }catch(e){const status=e.status??(/Almacenamiento|fetch failed|timeout|aborted/i.test(e.message)?503:400);json(res,status,{error:status===503?'No se pudo guardar o recuperar la partida. Reintenta; tu última jugada guardada se conserva.':e.message});}
   finally{if(lock)locks.delete(lock);}
 });

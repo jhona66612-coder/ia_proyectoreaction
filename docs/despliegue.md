@@ -30,6 +30,8 @@ En desarrollo se probaron además ocho turnos consecutivos con persistencia real
 
 ## Actualizar
 
+La versión 2.0 añade configuración en `/`, juego separado en `/play`, once tamaños de tablero y animaciones basadas en los pasos públicos del motor. Las 22 pruebas automáticas pasan en desarrollo. Se comprobó en navegador la apertura de una pestaña, grupos giratorios de dos y tres cargas, captura, explosión y redistribución; a 390 × 844 las casillas miden 52 px y a 360 × 640 conservan 44 px con desplazamiento interno. Las guías 2.0 tienen 4 y 8 páginas y se inspeccionaron renderizadas.
+
 Ejecuta las pruebas antes de subir cambios a main. Si el servicio está vinculado al proveedor Git con autodespliegue, Render despliega ese commit. Si usa una URL pública sin integración Git, solicita un despliegue manual de la versión nueva. Comprueba el estado live y /health; un despliegue simplemente aceptado todavía no está publicado.
 
 ## Copia local

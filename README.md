@@ -9,7 +9,11 @@ Juego táctico para demostrar agentes de inteligencia artificial, basado en la p
 - [Guía de agentes](docs/guia-agentes.pdf) · [versión Markdown](docs/guia-agentes.md).
 - [Matriz de cumplimiento](docs/matriz-cumplimiento.md).
 
-Tres modos: humano contra IA, dos jugadores locales y demostración IA contra IA. Tableros 4 × 4, 6 × 6 y 8 × 8; tres niveles de búsqueda; mapas de riesgo; explicación de decisiones; laboratorio de evaluación y aprendizaje; bitácora descargable; persistencia en Supabase.
+Tres modos: humano contra IA, dos jugadores locales y demostración IA contra IA. Once tamaños hasta 10 × 12 (columnas × filas), con formatos verticales para móvil; tres niveles de búsqueda; mapas de riesgo; explicación de decisiones; laboratorio de evaluación y aprendizaje; bitácora descargable; persistencia en Supabase.
+
+La configuración está en `/` y «Empezar partida» abre `/play` en otra pestaña (o en la actual si el navegador bloquea ventanas). La arena usa casillas táctiles de 44–52 px, grupos de bolitas superpuestos que giran y cascadas animadas con viajes y absorción de rivales. Cada paso reproduce recibos públicos del motor; omitir la animación no altera el resultado. El menú ofrece velocidad, riesgo, ruta y sonido; el botón IA abre métricas y bitácora.
+
+Reglas **Táctico** conserva los eventos ocultos de la propuesta; **Clásico** permite aprender sin eventos. El contador `2/4` muestra cargas actuales y umbral de explosión. Esquinas explotan con 2, bordes con 3 e interiores con 4: una carga por vecino ortogonal. Capturar 2 rivales con una carga produce 3 propias.
 
 ## Ejecutar
 
@@ -54,7 +58,7 @@ La evaluación incluida no demuestra superioridad general: 24 partidas contra un
 ## Estructura
 
 ```text
-public/       Interfaz accesible, responsive, sin CDN
+public/       Configuración, arena móvil y reproducción de cascadas, sin CDN
 shared/       Motor, generador, creencias, búsqueda y evolución
 server/       API HTTP, sesiones Supabase y procesos de cálculo
 tests/        Reglas, IA, confidencialidad y ciclo HTTP
@@ -76,7 +80,7 @@ docs/         Dos guías en PDF/Markdown y operación
 
 ## Verificación
 
-`npm test` verifica reglas y seguridad del motor, 120 mapas, información oculta, equivalencia Minimax/alfa-beta, A* frente a Dijkstra y ciclo HTTP. Se probaron también las políticas RLS con dos capacidades diferentes y acceso sin token. Las guías se generan con ReportLab (dependencia solo de documentación) y se inspeccionan tras renderizarlas con Poppler.
+`npm test` verifica reglas y seguridad del motor, 120 mapas cuadrados y los formatos rectangulares, reconstrucción de cascadas desde los recibos de animación, conservación de cargas, información oculta, equivalencia Minimax/alfa-beta, A* frente a Dijkstra y ciclo HTTP. Se probaron también las políticas RLS con dos capacidades diferentes y acceso sin token. Las guías se generan con ReportLab (dependencia solo de documentación) y se inspeccionan tras renderizarlas con Poppler.
 
 ## Fuentes técnicas
 
